@@ -91,6 +91,9 @@ class HazardModel:
         while non_adopted:
             non_adopted_temp = []
             num_adopted = 0
+            user_done = 0
+            n_len = len(non_adopted)
+            logging.info("non_adopted : {}".format(n_len))
             for n in non_adopted:
                 # Row format [nodeid, step, variable0, ... variablen, adoption]
                 row = [n, step]
@@ -106,6 +109,9 @@ class HazardModel:
 
                 row.append(adoption)
                 mle_input_data.append(row)
+                user_done += 1
+                if user_done % 1000 == 0:
+                    logging.info(" user {}  step {}".format(user_done, step))
             non_adopted = non_adopted_temp
             if adopted == []:
                 adopted.append(num_adopted)

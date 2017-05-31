@@ -7,12 +7,14 @@ from DynamicNetwork import DynamicNetwork
 from HazardModel import HazardModel
 from Variables.X0Intercept import *
 from Variables.X4Sentiment import *
+from Variables.X1RetweetJaccard import X1RetweetJaccard
 from Utils.NetworkUtils import *
 from Utils.Plot import *
 
 WEEK_IN_SECOND = 7 * 24 * 60 * 60
 STOP_STEP = 13
 SENTIMENT_DATA = "data/thegoodplace_sentiment_seconds.json"
+INTERACTION_DATA = "data/TheGoodPlace_interactions.p"
 
 class DateAction(argparse.Action):
     """
@@ -44,7 +46,8 @@ def main():
     # TODO For Swati, put your varialbe here.
     variables = [
         X0Intercept(),
-        X4Sentiment(g, SENTIMENT_DATA)
+        #X4Sentiment(g, SENTIMENT_DATA)
+        X1RetweetJaccard(g, INTERACTION_DATA)
     ]
     for v in variables:
         assert hasattr(v, 'name'), "Each variable must have a name attribute"
