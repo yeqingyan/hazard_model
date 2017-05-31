@@ -14,14 +14,31 @@ class X4Sentiment(Variable):
 
     def get_covariate(self, node, current_date, nonadopted):
         """
-        Overwrite get_covariate function
+        Return all sentiment value(sum) a node received from its adopted neighbor.
+        At step 0, the value should be 0, since no neighbor is adopted.
+
         :param node: 
         :param current_date: 
         :param nonadopted: 
         :return:                sentiment varialbe of node at current_date 
         """
         step = date_to_step(current_date, self.network.start_date, self.network.intervals)
-        return self.sentiment[node][step]
+        if step == 0:
+            return 0.0
+        sentiment_value = 0.0
+        adopted_neighbors = 0.0
+        for neighbor in self.network.friends(node, current_date):
+            if neighbor in nonadopted:
+                continue
+            else:
+                adopted_neighbors += 1
+                sentiment_value += self.sentiment[neighbor][step-1]
+
+        # return self.sentiment[node][step]
+        if adopted_neighbors == 0:
+            return sentiment_value
+        else:
+            return sentiment_value / adopted_neighbors
 
     def parse_sentiment(self, json_data, start_date, stop_step, intervals, debug=False):
         """

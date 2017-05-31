@@ -21,9 +21,13 @@ class HazardModel:
         ref_result, inputdata = self.generate_MLE_input_data()
         # Remove the first two column "nodeid" and "step", use the last column as endog, use the remain column as exog
         exog, endog = inputdata.iloc[:, 2:-1] ,inputdata.iloc[:, -1]
+        print(exog)
         hazard_mle = HazardMLE(exog=exog, endog=endog)
         logging.info("MLE start fiting")
+
         result = hazard_mle.fit()
+        # Note `summary()` might not work on small samples, since it didn't know how to normalized a vector of zeros
+        logging.info(result.summary())
         logging.info("MLE loglikelihood")
         self.print_loglikelihood(exog, endog, result.params)
         return ref_result, result.params

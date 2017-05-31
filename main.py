@@ -28,8 +28,6 @@ class DateAction(argparse.Action):
         setattr(namespace, self.dest, start_date)
 
 def config():
-    logging.basicConfig(filename="hazard_model.log", level=logging.NOTSET)
-
     program_description = "Hazard model"
     parser = argparse.ArgumentParser(description=program_description)
     parser.add_argument('g', help='Input network graph')
@@ -39,7 +37,7 @@ def config():
 def main():
     arguments = config()
     g = get_graphml(arguments['g'])
-    # g = sample(g, 10 / len(g))
+    # g = sample(g, 5 / len(g))
 
     g = DynamicNetwork(g, start_date=arguments['d'], intervals=WEEK_IN_SECOND, stop_step=STOP_STEP)
 
@@ -52,6 +50,7 @@ def main():
         assert hasattr(v, 'name'), "Each variable must have a name attribute"
 
     hazard_model = HazardModel(g, variables)
+    logging.info("Begin MLE estimation")
     # Step 1. MLE estimation
     ref_result, params = hazard_model.hazard_mle_estimation()
 
@@ -61,6 +60,6 @@ def main():
     plot({"Reference": ref_result, "MLE result": sim_result}, show=False)
 
 if __name__ == "__main__":
-    logging.basicConfig(filename="hazard.log", level=logging.NOTSET)
+    logging.basicConfig(filename="hazard.log", level=logging.NOTSET, format='%(asctime)s %(message)s')
     main()
 
