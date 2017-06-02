@@ -1,3 +1,6 @@
+import os
+import matplotlib
+matplotlib.use("Pdf")
 from matplotlib import pyplot as plt
 
 def plot(data, show=True, ymin=None, xlabel=None, ylabel=None):
@@ -13,7 +16,7 @@ def plot(data, show=True, ymin=None, xlabel=None, ylabel=None):
     if show:
         plt.show()
     else:
-        plt.savefig("plot.png")
+        plt.savefig("plot_x2.png")
     plt.clf()
 
 def hist(data, show=True, ymin=None):

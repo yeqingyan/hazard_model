@@ -27,6 +27,20 @@ class Interaction:
         self.memoise[key] = jac
         return jac
 
+
+    def interaction_count(self, user1, user2):
+        '''
+
+        :param user1: source user
+        :param user2: destination user
+        :return: count of interaction from user1 to user2
+        '''
+        all_interactions = self.interactions[int(user1)]['interactions']
+        s_user2 = str(user2)
+        if s_user2 in all_interactions:
+            return all_interactions[s_user2]
+        return 0
+
     @staticmethod
     def load_file(filename, type):
         if type == 'p':
