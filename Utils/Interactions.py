@@ -15,16 +15,16 @@ class Interaction:
         :param type: "json" or "p"
         '''
         self.interactions = Interaction.load_file(file_name, type)
-        self.memoise = dict()
+        # self.memoise = dict()
 
     def retweet_jaccard(self, user1, user2):
         key = (user1, user2)
-        if(key  in self.memoise):
-            return self.memoise[key]
-        user1_retweet_set = list(self.interactions[int(user1)]['retweets'].keys())
-        user2_retweet_set = list(self.interactions[int(user2)]['retweets'].keys())
+        # if(key  in self.memoise):
+        #     return self.memoise[key]
+        user1_retweet_set = set(self.interactions[int(user1)]['retweets'].keys())
+        user2_retweet_set = set(self.interactions[int(user2)]['retweets'].keys())
         jac = Interaction.jaccard(user1_retweet_set, user2_retweet_set)
-        self.memoise[key] = jac
+        # self.memoise[key] = jac
         return jac
 
 
@@ -51,13 +51,7 @@ class Interaction:
 
     @staticmethod
     def jaccard(a, b):
-        union = list(set(a + b))
-        set_a = set(a)
-        set_b = set(b)
-        intersection = list(set_a - (set_a - set_b))
-        # print(intersection)
-        if len(union) == 0:
+        if len(a) == len(b) == 0:
             return 0
-        jaccard_coeff = float(len(intersection)) / len(union)
-        return jaccard_coeff
-
+        else:
+            return float(len(a & b)) / len(a | b)

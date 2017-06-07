@@ -13,40 +13,40 @@ import logging
 import signal
 import traceback
 import resource
+import networkx as nx
 
-
-
-INTERACTION_DATA = "../data/TheGoodPlace_interactions.p"
+INTERACTION_DATA = "../data/TheGoodPlace_interactions_smaller.p"
 USER_FILE = "../data/TheGoodPlace.csv"
 
 def main():
-
     signal.signal(signal.SIGUSR1, lambda sig, stack: traceback.print_stack(stack))
     inter = Interaction(INTERACTION_DATA, type='p')
-    users = read_users(USER_FILE)
+    users = list(read_users(USER_FILE))
+    G = nx.Graph()
+    G.add_nodes_from(users)
+
     output = INTERACTION_DATA.rpartition('.')[0]
     logging.basicConfig(filename="preprocess1.log", level=logging.NOTSET, format='%(asctime)s %(message)s')
 
-    pair_wise = dict()
     count = 0
+    logging.info("Start")
     for user1, user2 in itertools.combinations(users, 2):
-        stats = get_stats(user1, user2, inter)
-        pair_wise[frozenset((user1, user2))] = stats
+        G.add_edge(user1, user2)
+        G[user1][user2]['jac'] = get_stats(user1, user2, inter)
         count += 1
-        if count % 10000 == 0:
+        if count % 10000000 == 0:
             logging.info('{} pairs done'.format(count))
             logging.info(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             #print(pair_wise)
             #break
-    pickle.dump(pair_wise, open(output + '_pairs.p', 'wb'))
-    json.dump(pair_wise, open(output + '_pairs.json', 'w'))
+    logging.info("Finished")
+    nx.write_graphml(G, output+"_pairs.graphml")
+    # pickle.dump(pair_wise, open('matrix.p', 'w'))
+    # pickle.dump(keymap, open('uid_index_map.p', 'w'))
+    # json.dump(pair_wise, open(output + '_pairs.json', 'w'))
 
 def get_stats(user1, user2, interactions):
-    stats = {}
-    stats['retweet_jac'] = interactions.retweet_jaccard(user1, user2)
-    #print(stats)
-    return stats
-
+    return interactions.retweet_jaccard(user1, user2)
 
 def read_users(user_file):
     with open(user_file, 'rb') as f:
