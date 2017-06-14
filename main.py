@@ -6,12 +6,13 @@ import time
 from DynamicNetwork import DynamicNetwork
 from HazardModel import HazardModel
 from Variables.X0Intercept import *
-from Variables.X4Sentiment import *
+from Variables.XSentiment import *
 from Utils.NetworkUtils import *
 from Utils.Plot import *
 
 WEEK_IN_SECOND = 7 * 24 * 60 * 60
 STOP_STEP = 13
+# See https://github.com/yeqingyan/Sentiment_MaxEnt for program to preprocessing the sentiment data using MaxEnt
 SENTIMENT_DATA = "data/thegoodplace_sentiment_seconds.json"
 
 class DateAction(argparse.Action):
@@ -37,14 +38,16 @@ def config():
 def main():
     arguments = config()
     g = get_graphml(arguments['g'])
-    # g = sample(g, 5 / len(g))
+    # g = sample(g, 30 / len(g))
 
     g = DynamicNetwork(g, start_date=arguments['d'], intervals=WEEK_IN_SECOND, stop_step=STOP_STEP)
 
     # TODO For Swati, put your varialbe here.
     variables = [
         X0Intercept(),
-        X4Sentiment(g, SENTIMENT_DATA)
+        XSentiment(g, SENTIMENT_DATA, XSentiment.POSITIVE),     # X4Positive
+        XSentiment(g, SENTIMENT_DATA, XSentiment.NEUTRAL),      # X5Neutral
+        XSentiment(g, SENTIMENT_DATA, XSentiment.NEGATIVE),     # X6Negative
     ]
     for v in variables:
         assert hasattr(v, 'name'), "Each variable must have a name attribute"
